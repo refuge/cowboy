@@ -99,8 +99,16 @@ endif
 endif
 export ERL_LIBS
 
+OTP_VER = $(shell sh -c "erl -noshell -eval 'io:fwrite(\"~s\n\", [erlang:system_info(otp_release)]).' -s erlang halt 2>/dev/null")
+
 ERLC_OPTS ?= -Werror +debug_info +warn_export_all +warn_export_vars \
 	+warn_shadow_vars +warn_obsolete_guard # +bin_opt_info +warn_missing_spec
+
+ifeq (,$(findstring R15,$(OTP_VER)))
+	ERLC_OPTS += -Dsha_workaround=true
+endif
+
+
 COMPILE_FIRST ?=
 COMPILE_FIRST_PATHS = $(addprefix src/,$(addsuffix .erl,$(COMPILE_FIRST)))
 
